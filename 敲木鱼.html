@@ -7,149 +7,7 @@
   <title>禅意木鱼 - 冥想敲击游戏</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --accent-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-      --wooden-gradient: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-    }
-    
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      font-family: 'Noto Sans SC', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    
-    .wooden-fish {
-      transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
-    }
-    
-    .wooden-fish:hover {
-      transform: scale(1.05);
-      filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3));
-    }
-    
-    .wooden-fish:active {
-      transform: scale(0.95);
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-    }
-    
-    .pulse-animation {
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .floating {
-      animation: floating 3s ease-in-out infinite;
-    }
-    
-    @keyframes floating {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-    
-    .click-effect {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.7);
-      pointer-events: none;
-      animation: clickWave 0.6s linear;
-    }
-    
-    @keyframes clickWave {
-      0% {
-        transform: scale(0.5);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(3);
-        opacity: 0;
-      }
-    }
-    
-    .progress-bar {
-      height: 12px;
-      border-radius: 10px;
-      background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-      transition: width 0.5s ease-in-out;
-    }
-    
-    .card-glass {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-    
-    .btn-primary {
-      background: var(--primary-gradient);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
-    
-    .btn-secondary {
-      background: var(--secondary-gradient);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
-    }
-    
-    .btn-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
-    }
-    
-    .btn-accent {
-      background: var(--accent-gradient);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
-    }
-    
-    .btn-accent:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(67, 233, 123, 0.6);
-    }
-    
-    .modal-overlay {
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-    }
-    
-    .rank-item:nth-child(1) {
-      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-      color: white;
-    }
-    
-    .rank-item:nth-child(2) {
-      background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
-      color: white;
-    }
-    
-    .rank-item:nth-child(3) {
-      background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%);
-      color: white;
-    }
-    
-    .rank-item:nth-child(n+4) {
-      background: rgba(240, 240, 240, 0.9);
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
   <header class="w-full max-w-4xl mb-8 text-center">
@@ -160,7 +18,6 @@
   </header>
 
   <main class="w-full max-w-4xl">
-    <!-- 登录/游客选择 -->
     <div id="auth-section" class="card-glass p-8 mb-8">
       <div class="text-center mb-6">
         <i class="fas fa-user-circle text-5xl text-blue-500 mb-4"></i>
@@ -177,7 +34,6 @@
       </div>
     </div>
 
-    <!-- 登录表单 -->
     <div id="login-form" class="hidden card-glass p-8 mb-8">
       <div class="text-center mb-6">
         <i class="fas fa-user-edit text-5xl text-green-500 mb-4"></i>
@@ -195,9 +51,7 @@
       </div>
     </div>
 
-    <!-- 游戏主界面 -->
     <div id="game-section" class="hidden">
-      <!-- 用户信息卡片 -->
       <div class="card-glass p-6 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
           <i class="fas fa-user-circle text-3xl text-blue-500 mb-2"></i>
@@ -216,7 +70,6 @@
         </div>
       </div>
 
-      <!-- 进度条 -->
       <div class="card-glass p-6 mb-8">
         <div class="flex justify-between mb-2">
           <span class="font-medium">修行进度</span>
@@ -227,7 +80,6 @@
         </div>
       </div>
 
-      <!-- 木鱼区域 -->
       <div class="card-glass p-8 mb-8 text-center relative">
         <div class="mb-6">
           <h3 class="text-2xl font-bold text-gray-800 mb-2">敲击木鱼</h3>
@@ -245,7 +97,6 @@
         <p class="text-gray-600">点击次数：<span id="click-count">0</span></p>
       </div>
 
-      <!-- 操作按钮 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <button id="reset-btn" class="btn-secondary text-white py-4 rounded-xl font-bold flex items-center justify-center">
           <i class="fas fa-redo mr-2"></i>重置数据
@@ -259,7 +110,6 @@
       </div>
     </div>
 
-    <!-- 排行榜弹窗 -->
     <div id="rankings-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
       <div class="card-glass rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
         <button id="close-rankings" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl z-10">
@@ -288,7 +138,6 @@
           </div>
           
           <div id="rankings-content" class="text-left">
-            <!-- 动态加载排行榜内容 -->
           </div>
         </div>
       </div>
@@ -299,39 +148,6 @@
     <p>&copy; 2026 禅意木鱼 - 冥想敲击游戏 | 积德行善，从敲木鱼开始</p>
   </footer>
 
-  <script>
-    // 全局变量
-    let currentUser = null;
-    let isGuest = false;
-    let totalClicks = 0;
-    let level = 1;
-    const clicksPerLevel = 100;
-
-    // DOM 元素
-    const authSection = document.getElementById('auth-section');
-    const loginForm = document.getElementById('login-form');
-    const gameSection = document.getElementById('game-section');
-    const rankingsModal = document.getElementById('rankings-modal');
-    const woodenFishImg = document.getElementById('wooden-fish-img');
-    const userNameSpan = document.getElementById('user-name');
-    const userLevelSpan = document.getElementById('user-level');
-    const totalCountSpan = document.getElementById('total-count');
-    const progressText = document.getElementById('progress-text');
-    const progressBar = document.getElementById('progress-bar');
-    const clickCountSpan = document.getElementById('click-count');
-    const clickEffectsContainer = document.getElementById('click-effects-container');
-
-    // 页面加载完成后初始化事件监听器
-    document.addEventListener('DOMContentLoaded', function() {
-      // 初始化按钮事件
-      initEventListeners();
-      
-      // 隐藏所有部分，只显示认证部分
-      hideAllSections();
-      authSection.classList.remove('hidden');
-    });
-
-    // 初始化所有事件监听器
-    function initEventListeners() {
-      // 认证相关按钮
-      document.getElementById('guest-btn').
+  <script src="app.js"></script>
+</body>
+</html>
