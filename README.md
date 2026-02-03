@@ -7,4 +7,4 @@
 ## 项目
 
 * [闪电反应测试](https://friend-me.github.io/Easy_Projects/react.html)
-* [谷歌恐龙](https://friend-me.github.io/Easy_Projects/谷歌恐龙/dinosaur.html)
+* [谷歌恐龙](https://friend-me.github.io/Easy_Projects/dinosaur.html)
