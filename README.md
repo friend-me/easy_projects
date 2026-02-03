@@ -4,6 +4,7 @@
 
 脑子有病的时候会更新一下
 
-## HTML
+## 项目
 
-* [闪电反应测试](https://friend-me.github.io/easy_projects/HTML/react.html)
+* [闪电反应测试](https://friend-me.github.io/easy_projects/react.html)
+* [谷歌恐龙](https://friend-me.github.io/easy_projects/谷歌恐龙/dinosaur.html)
