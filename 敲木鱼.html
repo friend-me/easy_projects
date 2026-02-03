@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>禅意木鱼 - 冥想敲击游戏</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --wooden-gradient: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Noto Sans SC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .wooden-fish {
+      transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+    }
+    
+    .wooden-fish:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3));
+    }
+    
+    .wooden-fish:active {
+      transform: scale(0.95);
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .click-effect {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+      animation: clickWave 0.6s linear;
+    }
+    
+    @keyframes clickWave {
+      0% {
+        transform: scale(0.5);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+    
+    .progress-bar {
+      height: 12px;
+      border-radius: 10px;
+      background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+      transition: width 0.5s ease-in-out;
+    }
+    
+    .card-glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .btn-primary {
+      background: var(--primary-gradient);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary-gradient);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+    }
+    
+    .btn-accent {
+      background: var(--accent-gradient);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+    }
+    
+    .btn-accent:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(67, 233, 123, 0.6);
+    }
+    
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+    }
+    
+    .rank-item:nth-child(1) {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      color: white;
+    }
+    
+    .rank-item:nth-child(2) {
+      background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+      color: white;
+    }
+    
+    .rank-item:nth-child(3) {
+      background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%);
+      color: white;
+    }
+    
+    .rank-item:nth-child(n+4) {
+      background: rgba(240, 240, 240, 0.9);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <header class="w-full max-w-4xl mb-8 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 mb-2">
+      <i class="fas fa-dharmachakra mr-3"></i>禅意木鱼
+    </h1>
+    <p class="text-gray-600 text-lg">敲击木鱼，积累功德，净化心灵</p>
+  </header>
+
+  <main class="w-full max-w-4xl">
+    <!-- 登录/游客选择 -->
+    <div id="auth-section" class="card-glass p-8 mb-8">
+      <div class="text-center mb-6">
+        <i class="fas fa-user-circle text-5xl text-blue-500 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-800">选择登录方式</h2>
+        <p class="text-gray-600 mt-2">开始你的冥想之旅</p>
+      </div>
+      <div class="flex flex-col md:flex-row gap-6 justify-center">
+        <button id="guest-btn" class="btn-secondary text-white py-4 px-8 rounded-xl font-bold text-lg flex items-center justify-center">
+          <i class="fas fa-user-secret mr-2"></i>游客模式
+        </button>
+        <button id="login-btn" class="btn-primary text-white py-4 px-8 rounded-xl font-bold text-lg flex items-center justify-center">
+          <i class="fas fa-sign-in-alt mr-2"></i>登录账号
+        </button>
+      </div>
+    </div>
+
+    <!-- 登录表单 -->
+    <div id="login-form" class="hidden card-glass p-8 mb-8">
+      <div class="text-center mb-6">
+        <i class="fas fa-user-edit text-5xl text-green-500 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-800">登录或注册</h2>
+        <p class="text-gray-600 mt-2">创建账号以保存你的修行记录</p>
+      </div>
+      <div class="max-w-md mx-auto">
+        <input type="text" id="username-input" placeholder="请输入用户名" class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-lg focus:border-blue-500 focus:outline-none">
+        <button id="confirm-login-btn" class="w-full btn-accent text-white py-4 rounded-xl font-bold text-lg mb-4">
+          <i class="fas fa-check-circle mr-2"></i>确认登录
+        </button>
+        <button id="back-to-auth" class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium">
+          <i class="fas fa-arrow-left mr-2"></i>返回选择
+        </button>
+      </div>
+    </div>
+
+    <!-- 游戏主界面 -->
+    <div id="game-section" class="hidden">
+      <!-- 用户信息卡片 -->
+      <div class="card-glass p-6 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
+          <i class="fas fa-user-circle text-3xl text-blue-500 mb-2"></i>
+          <p class="text-gray-600">用户名</p>
+          <p class="text-xl font-bold" id="user-name">游客</p>
+        </div>
+        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
+          <i class="fas fa-award text-3xl text-yellow-500 mb-2"></i>
+          <p class="text-gray-600">等级</p>
+          <p class="text-xl font-bold" id="user-level">1</p>
+        </div>
+        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
+          <i class="fas fa-bullseye text-3xl text-green-500 mb-2"></i>
+          <p class="text-gray-600">总次数</p>
+          <p class="text-xl font-bold" id="total-count">0</p>
+        </div>
+      </div>
+
+      <!-- 进度条 -->
+      <div class="card-glass p-6 mb-8">
+        <div class="flex justify-between mb-2">
+          <span class="font-medium">修行进度</span>
+          <span id="progress-text">0 / 100</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-xl h-4">
+          <div id="progress-bar" class="progress-bar rounded-xl h-4" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 木鱼区域 -->
+      <div class="card-glass p-8 mb-8 text-center relative">
+        <div class="mb-6">
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">敲击木鱼</h3>
+          <p class="text-gray-600">点击木鱼积累功德，每100次敲击提升一级</p>
+        </div>
+        <div class="flex justify-center mb-6">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1606743825-936c2a0e8635?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" 
+                 alt="精美木鱼图片" 
+                 class="wooden-fish cursor-pointer w-64 h-64 mx-auto floating" 
+                 id="wooden-fish-img">
+            <div id="click-effects-container" class="absolute inset-0 pointer-events-none"></div>
+          </div>
+        </div>
+        <p class="text-gray-600">点击次数：<span id="click-count">0</span></p>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <button id="reset-btn" class="btn-secondary text-white py-4 rounded-xl font-bold flex items-center justify-center">
+          <i class="fas fa-redo mr-2"></i>重置数据
+        </button>
+        <button id="rankings-btn" class="btn-primary text-white py-4 rounded-xl font-bold flex items-center justify-center">
+          <i class="fas fa-trophy mr-2"></i>查看排行榜
+        </button>
+        <button id="logout-btn" class="btn-accent text-white py-4 rounded-xl font-bold flex items-center justify-center">
+          <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+        </button>
+      </div>
+    </div>
+
+    <!-- 排行榜弹窗 -->
+    <div id="rankings-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
+      <div class="card-glass rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+        <button id="close-rankings" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl z-10">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="p-8">
+          <div class="text-center mb-8">
+            <i class="fas fa-trophy text-5xl text-yellow-500 mb-4"></i>
+            <h2 class="text-3xl font-bold text-gray-800">功德排行榜</h2>
+            <p class="text-gray-600 mt-2">见证修行者的成就</p>
+          </div>
+          
+          <div class="flex flex-wrap gap-3 mb-6 justify-center">
+            <button class="tab-btn active bg-blue-500 text-white px-6 py-3 rounded-xl font-bold" data-tab="total">
+              <i class="fas fa-star mr-2"></i>总榜
+            </button>
+            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="daily">
+              <i class="fas fa-sun mr-2"></i>日榜
+            </button>
+            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="weekly">
+              <i class="fas fa-calendar-week mr-2"></i>周榜
+            </button>
+            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="monthly">
+              <i class="fas fa-calendar-alt mr-2"></i>月榜
+            </button>
+          </div>
+          
+          <div id="rankings-content" class="text-left">
+            <!-- 动态加载排行榜内容 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full max-w-4xl text-center text-gray-500 mt-8 pb-4">
+    <p>&copy; 2026 禅意木鱼 - 冥想敲击游戏 | 积德行善，从敲木鱼开始</p>
+  </footer>
+
+  <script>
+    // 全局变量
+    let currentUser = null;
+    let isGuest = false;
+    let totalClicks = 0;
+    let level = 1;
+    const clicksPerLevel = 100;
+
+    // DOM 元素
+    const authSection = document.getElementById('auth-section');
+    const loginForm = document.getElementById('login-form');
+    const gameSection = document.getElementById('game-section');
+    const rankingsModal = document.getElementById('rankings-modal');
+    const woodenFishImg = document.getElementById('wooden-fish-img');
+    const userNameSpan = document.getElementById('user-name');
+    const userLevelSpan = document.getElementById('user-level');
+    const totalCountSpan = document.getElementById('total-count');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const clickCountSpan = document.getElementById('click-count');
+    const clickEffectsContainer = document.getElementById('click-effects-container');
+
+    // 页面加载完成后初始化事件监听器
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化按钮事件
+      initEventListeners();
+      
+      // 隐藏所有部分，只显示认证部分
+      hideAllSections();
+      authSection.classList.remove('hidden');
+    });
+
+    // 初始化所有事件监听器
+    function initEventListeners() {
+      // 认证相关按钮
+      document.getElementById('guest-btn').
