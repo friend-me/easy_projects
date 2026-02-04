@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解压史莱姆模拟器 🟢</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c2e, #1a1a3e);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #4a4aff;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #7afcff;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(122, 252, 255, 0.7);
+        }
+        
+        .subtitle {
+            color: #b0b0ff;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .game-area {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(20, 20, 60, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333377;
+        }
+        
+        .slime-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: rgba(10, 10, 40, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid #444499;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        
+        #slime {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(30, 30, 80, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        h2 {
+            color: #7afcff;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #4a4aff;
+            padding-bottom: 8px;
+        }
+        
+        .slime-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .slime-type {
+            flex: 1;
+            min-width: 80px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+        
+        .slime-type:hover {
+            transform: translateY(-5px);
+            border-color: #7afcff;
+        }
+        
+        .slime-type.active {
+            border-color: #7afcff;
+            box-shadow: 0 0 15px rgba(122, 252, 255, 0.7);
+            transform: translateY(-5px);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(30, 30, 80, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-box:hover {
+            background: rgba(40, 40, 100, 0.8);
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #7afcff;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #b0b0ff;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a4aff, #7afcff);
+            color: #0c0c2e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(122, 252, 255, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .achievements {
+            margin-top: 25px;
+        }
+        
+        .achievement-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .achievement {
+            background: rgba(30, 30, 80, 0.6);
+            border-radius: 10px;
+            padding: 12px;
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+        
+        .achievement.unlocked {
+            background: rgba(40, 80, 40, 0.6);
+            border-left: 4px solid #7afcff;
+        }
+        
+        .achievement i {
+            font-size: 1.5rem;
+            color: #ffcc00;
+        }
+        
+        .instructions {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(30, 30, 80, 0.6);
+            border-radius: 15px;
+            line-height: 1.6;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #333377;
+            color: #8888cc;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .slime-container {
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        /* 振动效果 */
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            10% { transform: translate(-2px, -2px); }
+            20% { transform: translate(2px, -2px); }
+            30% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, -2px); }
+            70% { transform: translate(-2px, 2px); }
+            80% { transform: translate(2px, 2px); }
+            90% { transform: translate(-2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        .vibrate {
+            animation: vibrate 0.3s linear;
+        }
+        
+        /* 弹跳效果 */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+        
+        .bounce {
+            animation: bounce 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-blender-phone"></i> 解压史莱姆模拟器</h1>
+            <p class="subtitle">点击、拖拽、拉伸、挤压这只可爱的史莱姆来缓解压力！尝试不同的史莱姆类型，解锁成就，享受ASMR般的解压体验。</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="game-area">
+                <div class="slime-container" id="slimeContainer">
+                    <div id="slime" class="slime-default"></div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <h2><i class="fas fa-palette"></i> 史莱姆类型</h2>
+                        <div class="slime-types">
+                            <div class="slime-type active" style="background: linear-gradient(135deg, #4CAF50, #8BC34A);" data-type="classic">经典</div>
+                            <div class="slime-type" style="background: linear-gradient(135deg, #2196F3, #03A9F4);" data-type="jelly">果冻</div>
+                            <div class="slime-type" style="background: linear-gradient(135deg, #9C27B0, #E91E63);" data-type="glitter">亮粉</div>
+                            <div class="slime-type" style="background: linear-gradient(135deg, #FF9800, #FFC107);" data-type="bouncy">弹跳</div>
+                            <div class="slime-type" style="background: linear-gradient(135deg, #00BCD4, #009688);" data-type="gooey">粘稠</div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h2><i class="fas fa-gamepad"></i> 互动</h2>
+                        <div>
+                            <button id="bounceBtn"><i class="fas fa-basketball-ball"></i> 弹跳</button>
+                            <button id="shakeBtn"><i class="fas fa-bolt"></i> 振动</button>
+                            <button id="resetBtn"><i class="fas fa-redo"></i> 重置</button>
+                            <button id="soundToggle"><i class="fas fa-volume-up"></i> 音效</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">拉伸次数</div>
+                        <div class="stat-value" id="stretchCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">挤压次数</div>
+                        <div class="stat-value" id="squishCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">互动时间</div>
+                        <div class="stat-value" id="playTime">0s</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">解压分数</div>
+                        <div class="stat-value" id="score">100</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievements">
+                <h2><i class="fas fa-trophy"></i> 成就</h2>
+                <div class="achievement-list">
+                    <div class="achievement unlocked">
+                        <i class="fas fa-hand-pointer"></i>
+                        <div>
+                            <div>首次触摸</div>
+                            <small>第一次触摸史莱姆</small>
+                        </div>
+                    </div>
+                    <div class="achievement" id="stretchAchievement">
+                        <i class="fas fa-expand-alt"></i>
+                        <div>
+                            <div>拉伸大师</div>
+                            <small>拉伸史莱姆50次</small>
+                        </div>
+                    </div>
+                    <div class="achievement" id="squishAchievement">
+                        <i class="fas fa-compress-alt"></i>
+                        <div>
+                            <div>挤压专家</div>
+                            <small>挤压史莱姆30次</small>
+                        </div>
+                    </div>
+                    <div class="achievement" id="timeAchievement">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <div>时间管理者</div>
+                            <small>互动超过1分钟</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2><i class="fas fa-info-circle"></i> 使用说明</h2>
+            <ul>
+                <li><strong>点击拖动</strong> - 拉伸史莱姆到不同方向</li>
+                <li><strong>快速点击</strong> - 使史莱姆振动并产生粒子效果</li>
+                <li><strong>双击</strong> - 使史莱姆弹跳</li>
+                <li><strong>选择不同类型的史莱姆</strong> - 体验不同物理特性的史莱姆</li>
+                <li><strong>尝试所有互动按钮</strong> - 发现隐藏效果</li>
+                <li><strong>目标</strong> - 解锁所有成就，获得最高解压分数！</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>解压史莱姆模拟器 🟢 | 设计用于缓解压力和焦虑 | 使用HTML5、CSS3和JavaScript构建</p>
+            <p>注意：本应用仅用于娱乐和解压目的，实际效果可能因设备而异</p>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态变量
+        let gameState = {
+            stretchCount: 0,
+            squishCount: 0,
+            playTime: 0,
+            score: 100,
+            soundEnabled: true,
+            slimeType: 'classic',
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            slimeSize: 150,
+            bounceInterval: null,
+            achievements: {
+                firstTouch: true,
+                stretchMaster: false,
+                squishExpert: false,
+                timeManager: false
+            }
+        };
+        
+        // DOM元素
+        const slime = document.getElementById('slime');
+        const slimeContainer = document.getElementById('slimeContainer');
+        const stretchCountEl = document.getElementById('stretchCount');
+        const squishCountEl = document.getElementById('squishCount');
+        const playTimeEl = document.getElementById('playTime');
+        const scoreEl = document.getElementById('score');
+        const bounceBtn = document.getElementById('bounceBtn');
+        const shakeBtn = document.getElementById('shakeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const slimeTypes = document.querySelectorAll('.slime-type');
+        
+        // 初始化史莱姆
+        function initSlime() {
+            updateSlimeAppearance();
+            
+            // 鼠标/触摸事件
+            slime.addEventListener('mousedown', startDrag);
+            slime.addEventListener('touchstart', startDrag);
+            
+            // 双击事件
+            slime.addEventListener('dblclick', () => {
+                bounceSlime();
+                if (gameState.soundEnabled) playSound('bounce');
+            });
+            
+            // 点击事件（用于振动）
+            slime.addEventListener('click', (e) => {
+                if (!gameState.isDragging) {
+                    vibrateSlime();
+                    createParticles(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY, 10);
+                    if (gameState.soundEnabled) playSound('pop');
+                    
+                    // 解锁首次触摸成就
+                    if (gameState.achievements.firstTouch) {
+                        gameState.achievements.firstTouch = false;
+                        updateScore(10);
+                    }
+                }
+            });
+            
+            // 更新游戏时间
+            setInterval(() => {
+                gameState.playTime++;
+                playTimeEl.textContent = gameState.playTime + 's';
+                
+                // 每10秒增加一点分数
+                if (gameState.playTime % 10 === 0) {
+                    updateScore(5);
+                }
+                
+                // 解锁时间管理者成就
+                if (gameState.playTime >= 60 && !gameState.achievements.timeManager) {
+                    gameState.achievements.timeManager = true;
+                    document.getElementById('timeAchievement').classList.add('unlocked');
+                    updateScore(30);
+                    showNotification('成就解锁: 时间管理者!');
+                }
+            }, 1000);
+        }
+        
+        // 开始拖拽
+        function startDrag(e) {
+            e.preventDefault();
+            gameState.isDragging = true;
+            gameState.dragStartX = e.clientX || e.touches[0].clientX;
+            gameState.dragStartY = e.clientY || e.touches[0].clientY;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        // 拖拽中
+        function drag(e) {
+            if (!gameState.isDragging) return;
+            
+            e.preventDefault();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            if (!clientX || !clientY) return;
+            
+            const deltaX = clientX - gameState.dragStartX;
+            const deltaY = clientY - gameState.dragStartY;
+            
+            // 计算拉伸比例
+            const stretchX = 1 + Math.abs(deltaX) / 100;
+            const stretchY = 1 + Math.abs(deltaY) / 100;
+            
+            // 根据拖拽方向应用变换
+            let transform = '';
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // 水平拉伸
+                transform = `scaleX(${stretchX}) scaleY(${1.5 - stretchX * 0.5})`;
+                gameState.stretchCount++;
+                stretchCountEl.textContent = gameState.stretchCount;
+                
+                // 每拉伸5次增加分数
+                if (gameState.stretchCount % 5 === 0) {
+                    updateScore(5);
+                    createParticles(clientX, clientY, 5);
+                }
+                
+                // 解锁拉伸大师成就
+                if (gameState.stretchCount >= 50 && !gameState.achievements.stretchMaster) {
+                    gameState.achievements.stretchMaster = true;
+                    document.getElementById('stretchAchievement').classList.add('unlocked');
+                    updateScore(50);
+                    showNotification('成就解锁: 拉伸大师!');
+                }
+            } else {
+                // 垂直挤压
+                transform = `scaleY(${stretchY}) scaleX(${1.5 - stretchY * 0.5})`;
+                gameState.squishCount++;
+                squishCountEl.textContent = gameState.squishCount;
+                
+                // 每挤压5次增加分数
+                if (gameState.squishCount % 5 === 0) {
+                    updateScore(5);
+                    createParticles(clientX, clientY, 5);
+                }
+                
+                // 解锁挤压专家成就
+                if (gameState.squishCount >= 30 && !gameState.achievements.squishExpert) {
+                    gameState.achievements.squishExpert = true;
+                    document.getElementById('squishAchievement').classList.add('unlocked');
+                    updateScore(50);
+                    showNotification('成就解锁: 挤压专家!');
+                }
+            }
+            
+            // 应用变换
+            slime.style.transform = transform;
+            
+            // 播放声音
+            if (gameState.soundEnabled && (gameState.stretchCount % 3 === 0 || gameState.squishCount % 3 === 0)) {
+                playSound('squish');
+            }
+            
+            // 更新起始位置以实现连续拖拽
+            gameState.dragStartX = clientX;
+            gameState.dragStartY = clientY;
+        }
+        
+        // 停止拖拽
+        function stopDrag() {
+            gameState.isDragging = false;
+            
+            // 恢复史莱姆形状
+            slime.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            slime.style.transform = 'scale(1)';
+            
+            // 移除事件监听器
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchend', stopDrag);
+            
+            // 移除过渡效果
+            setTimeout(() => {
+                slime.style.transition = 'transform 0.1s';
+            }, 500);
+        }
+        
+        // 弹跳史莱姆
+        function bounceSlime() {
+            slime.classList.add('bounce');
+            
+            // 创建弹跳粒子
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const rect = slime.getBoundingClientRect();
+                    createParticles(
+                        rect.left + rect.width / 2, 
+                        rect.top + rect.height / 2, 
+                        3
+                    );
+                }, i * 50);
+            }
+            
+            setTimeout(() => {
+                slime.classList.remove('bounce');
+            }, 800);
+            
+            updateScore(10);
+        }
+        
+        // 振动史莱姆
+        function vibrateSlime() {
+            slime.classList.add('vibrate');
+            setTimeout(() => {
+                slime.classList.remove('vibrate');
+            }, 300);
+            
+            updateScore(5);
+        }
+        
+        // 创建粒子效果
+        function createParticles(x, y, count) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 根据史莱姆类型设置粒子颜色
+                let color;
+                switch(gameState.slimeType) {
+                    case 'classic': color = '#4CAF50'; break;
+                    case 'jelly': color = '#2196F3'; break;
+                    case 'glitter': color = '#9C27B0'; break;
+                    case 'bouncy': color = '#FF9800'; break;
+                    case 'gooey': color = '#00BCD4'; break;
+                }
+                
+                particle.style.backgroundColor = color;
+                particle.style.width = Math.random() * 15 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                
+                document.body.appendChild(particle);
+                
+                // 随机方向动画
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 3 + 2;
+                const duration = Math.random() * 1000 + 500;
+                
+                const animate = () => {
+                    const currentLeft = parseFloat(particle.style.left);
+                    const currentTop = parseFloat(particle.style.top);
+                    
+                    particle.style.left = (currentLeft + Math.cos(angle) * speed) + 'px';
+                    particle.style.top = (currentTop + Math.sin(angle) * speed) + 'px';
+                    particle.style.opacity = parseFloat(particle.style.opacity) - 0.01;
+                    
+                    if (parseFloat(particle.style.opacity) > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        document.body.removeChild(particle);
+                    }
+                };
+                
+                // 开始动画
+                requestAnimationFrame(animate);
+                
+                // 自动移除粒子
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        document.body.removeChild(particle);
+                    }
+                }, 1500);
+            }
+        }
+        
+        // 播放音效
+        function playSound(type) {
+            // 创建音频上下文
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            if (type === 'pop') {
+                // 弹出声音
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } 
+            else if (type === 'squish') {
+                // 挤压声音
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(60, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            }
+            else if (type === 'bounce') {
+                // 弹跳声音
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+        
+        // 更新分数
+        function updateScore(points) {
+            gameState.score += points;
+            scoreEl.textContent = gameState.score;
+            
+            // 添加分数动画
+            scoreEl.style.transform = 'scale(1.2)';
+            scoreEl.style.color = '#FFCC00';
+            
+            setTimeout(() => {
+                scoreEl.style.transform = 'scale(1)';
+                scoreEl.style.color = '#7afcff';
+            }, 300);
+        }
+        
+        // 更新史莱姆外观
+        function updateSlimeAppearance() {
+            // 移除所有现有样式类
+            slime.className = '';
+            slime.classList.add(`slime-${gameState.slimeType}`);
+            
+            // 设置基础样式
+            slime.style.width = gameState.slimeSize + 'px';
+            slime.style.height = gameState.slimeSize + 'px';
+            slime.style.borderRadius = '50%';
+            slime.style.position = 'absolute';
+            
+            // 根据类型应用不同样式
+            switch(gameState.slimeType) {
+                case 'classic':
+                    slime.style.background = 'linear-gradient(135deg, #4CAF50, #8BC34A)';
+                    slime.style.boxShadow = 'inset -20px -20px 30px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.3)';
+                    break;
+                case 'jelly':
+                    slime.style.background = 'linear-gradient(135deg, #2196F3, #03A9F4)';
+                    slime.style.boxShadow = 'inset -20px -20px 30px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.5)';
+                    slime.style.opacity = '0.8';
+                    break;
+                case 'glitter':
+                    slime.style.background = 'linear-gradient(135deg, #9C27B0, #E91E63)';
+                    slime.style.boxShadow = 'inset -20px -20px 30px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.4), 0 0 20px rgba(255,255,255,0.5)';
+                    break;
+                case 'bouncy':
+                    slime.style.background = 'linear-gradient(135deg, #FF9800, #FFC107)';
+                    slime.style.boxShadow = 'inset -20px -20px 30px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.4)';
+                    break;
+                case 'gooey':
+                    slime.style.background = 'linear-gradient(135deg, #00BCD4, #009688)';
+                    slime.style.boxShadow = 'inset -20px -20px 30px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.3)';
+                    slime.style.opacity = '0.9';
+                    break;
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = '#4a4aff';
+            notification.style.color = 'white';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = '10px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+            notification.style.fontWeight = 'bold';
+            notification.style.transform = 'translateX(150%)';
+            notification.style.transition = 'transform 0.5s';
+            
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // 隐藏通知
+            setTimeout(() => {
+                notification.style.transform = 'translateX(150%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 500);
+            }, 3000);
+        }
+        
+        // 重置游戏
+        function resetGame() {
+            gameState.stretchCount = 0;
+            gameState.squishCount = 0;
+            gameState.playTime = 0;
+            gameState.score = 100;
+            
+            stretchCountEl.textContent = '0';
+            squishCountEl.textContent = '0';
+            playTimeEl.textContent = '0s';
+            scoreEl.textContent = '100';
+            
+            // 重置史莱姆位置和大小
+            slime.style.transform = 'scale(1) translate(0, 0)';
+            updateSlimeAppearance();
+            
+            showNotification('游戏已重置!');
+        }
+        
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 史莱姆类型选择
+            slimeTypes.forEach(type => {
+                type.addEventListener('click', () => {
+                    // 移除所有active类
+                    slimeTypes.forEach(t => t.classList.remove('active'));
+                    // 添加active类到当前类型
+                    type.classList.add('active');
+                    // 更新史莱姆类型
+                    gameState.slimeType = type.dataset.type;
+                    updateSlimeAppearance();
+                    
+                    // 播放声音
+                    if (gameState.soundEnabled) playSound('pop');
+                    updateScore(5);
+                });
+            });
+            
+            // 弹跳按钮
+            bounceBtn.addEventListener('click', () => {
+                bounceSlime();
+                if (gameState.soundEnabled) playSound('bounce');
+            });
+            
+            // 振动按钮
+            shakeBtn.addEventListener('click', () => {
+                vibrateSlime();
+                createParticles(
+                    slimeContainer.offsetLeft + slimeContainer.offsetWidth / 2,
+                    slimeContainer.offsetTop + slimeContainer.offsetHeight / 2,
+                    20
+                );
+                if (gameState.soundEnabled) playSound('pop');
+            });
+            
+            // 重置按钮
+            resetBtn.addEventListener('click', resetGame);
+            
+            // 音效切换
+            soundToggle.addEventListener('click', () => {
+                gameState.soundEnabled = !gameState.soundEnabled;
+                soundToggle.innerHTML = gameState.soundEnabled ? 
+                    '<i class="fas fa-volume-up"></i> 音效' : 
+                    '<i class="fas fa-volume-mute"></i> 静音';
+                
+                // 播放测试声音
+                if (gameState.soundEnabled) playSound('pop');
+            });
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initSlime();
+            initEventListeners();
+            
+            // 显示欢迎通知
+            setTimeout(() => {
+                showNotification('欢迎来到史莱姆解压模拟器！开始拉伸和挤压史莱姆吧！');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
