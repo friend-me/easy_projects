@@ -9,6 +9,9 @@
 * [闪电反应测试](https://friend-me.github.io/Easy_Projects/react.html)
 * [谷歌方龙](https://friend-me.github.io/Easy_Projects/dinosaur.html)
 * [敲木鱼](https://friend-me.github.io/Easy_Projects/敲木鱼.html)（这个页面跳转有问题……）
+* [史莱姆模拟器](https://friend-me.github.io/Easy_Projects/史莱姆模拟器.html)
+* [史莱姆模拟器2](https://friend-me.github.io/Easy_Projects/史莱姆模拟器2.html)
+* [史莱姆模拟器3](https://friend-me.github.io/Easy_Projects/史莱姆模拟器3.html)
 
 ## 其他好玩的
 
