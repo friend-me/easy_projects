@@ -2,7 +2,7 @@
 
 ## 简介
 
-纯瞎搞，脑子有病的时候会更新一下
+纯瞎搞，脑子抽疯的时候会更新一下。
 
 ## 项目
 
@@ -12,6 +12,10 @@
 * [史莱姆模拟器](https://friend-me.github.io/Easy_Projects/史莱姆模拟器.html)
 * [史莱姆模拟器2](https://friend-me.github.io/Easy_Projects/史莱姆模拟器2.html)
 * [史莱姆模拟器3](https://friend-me.github.io/Easy_Projects/史莱姆模拟器3.html)
+
+## 攻略
+
+
 
 ## 其他好玩的
 
