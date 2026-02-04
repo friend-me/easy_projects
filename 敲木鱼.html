@@ -7,147 +7,332 @@
   <title>禅意木鱼 - 冥想敲击游戏</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      min-height: 100vh;
+    }
+    .wooden-fish {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+    }
+    .wooden-fish:hover {
+      transform: scale(1.05);
+    }
+    .wooden-fish:active {
+      transform: scale(0.95);
+    }
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    .glow-text {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    .modal-backdrop {
+      backdrop-filter: blur(5px);
+    }
+    .rank-item:nth-child(1) .rank-number { background: linear-gradient(45deg, #ffd700, #ffa500); }
+    .rank-item:nth-child(2) .rank-number { background: linear-gradient(45deg, #c0c0c0, #a9a9a9); }
+    .rank-item:nth-child(3) .rank-number { background: linear-gradient(45deg, #cd7f32, #a0522d); }
+  </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
   <header class="w-full max-w-4xl mb-8 text-center">
-    <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 mb-2">
-      <i class="fas fa-dharmachakra mr-3"></i>禅意木鱼
-    </h1>
-    <p class="text-gray-600 text-lg">敲击木鱼，积累功德，净化心灵</p>
+    <h1 class="text-5xl font-bold text-white glow-text mb-2">禅意木鱼</h1>
+    <p class="text-xl text-white opacity-90">敲击木鱼，积累功德，静心修行</p>
   </header>
 
-  <main class="w-full max-w-4xl">
-    <div id="auth-section" class="card-glass p-8 mb-8">
-      <div class="text-center mb-6">
-        <i class="fas fa-user-circle text-5xl text-blue-500 mb-4"></i>
-        <h2 class="text-2xl font-bold text-gray-800">选择登录方式</h2>
-        <p class="text-gray-600 mt-2">开始你的冥想之旅</p>
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 justify-center">
-        <button id="guest-btn" class="btn-secondary text-white py-4 px-8 rounded-xl font-bold text-lg flex items-center justify-center">
-          <i class="fas fa-user-secret mr-2"></i>游客模式
+  <main class="w-full max-w-4xl bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8">
+    <!-- 登录/游客模式选择 -->
+    <div id="auth-section" class="mb-8">
+      <h2 class="text-3xl font-semibold text-white mb-6 text-center">选择修行方式</h2>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button id="guest-login" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-8 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <i class="fas fa-user-secret mr-2"></i>匿名修行
         </button>
-        <button id="login-btn" class="btn-primary text-white py-4 px-8 rounded-xl font-bold text-lg flex items-center justify-center">
-          <i class="fas fa-sign-in-alt mr-2"></i>登录账号
+        <button id="account-login" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 px-8 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <i class="fas fa-sign-in-alt mr-2"></i>正式入门
         </button>
       </div>
     </div>
 
-    <div id="login-form" class="hidden card-glass p-8 mb-8">
-      <div class="text-center mb-6">
-        <i class="fas fa-user-edit text-5xl text-green-500 mb-4"></i>
-        <h2 class="text-2xl font-bold text-gray-800">登录或注册</h2>
-        <p class="text-gray-600 mt-2">创建账号以保存你的修行记录</p>
-      </div>
-      <div class="max-w-md mx-auto">
-        <input type="text" id="username-input" placeholder="请输入用户名" class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-lg focus:border-blue-500 focus:outline-none">
-        <button id="confirm-login-btn" class="w-full btn-accent text-white py-4 rounded-xl font-bold text-lg mb-4">
-          <i class="fas fa-check-circle mr-2"></i>确认登录
+    <!-- 登录表单 -->
+    <div id="login-form" class="hidden mb-8">
+      <div class="max-w-md mx-auto bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+        <h2 class="text-2xl font-semibold text-white mb-4 text-center">佛门登记</h2>
+        <input type="text" id="username" placeholder="请输入法号" class="w-full p-3 border border-gray-300 rounded-lg mb-4 bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <button id="submit-login" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg">
+          <i class="fas fa-dharmachakra mr-2"></i>正式入门
         </button>
-        <button id="back-to-auth" class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-medium">
+        <button id="back-to-auth" class="mt-3 w-full text-white hover:text-gray-200 py-2 px-4 rounded transition flex items-center justify-center">
           <i class="fas fa-arrow-left mr-2"></i>返回选择
         </button>
       </div>
     </div>
 
-    <div id="game-section" class="hidden">
-      <div class="card-glass p-6 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
-          <i class="fas fa-user-circle text-3xl text-blue-500 mb-2"></i>
-          <p class="text-gray-600">用户名</p>
-          <p class="text-xl font-bold" id="user-name">游客</p>
-        </div>
-        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
-          <i class="fas fa-award text-3xl text-yellow-500 mb-2"></i>
-          <p class="text-gray-600">等级</p>
-          <p class="text-xl font-bold" id="user-level">1</p>
-        </div>
-        <div class="text-center p-4 rounded-xl bg-white bg-opacity-50">
-          <i class="fas fa-bullseye text-3xl text-green-500 mb-2"></i>
-          <p class="text-gray-600">总次数</p>
-          <p class="text-xl font-bold" id="total-count">0</p>
-        </div>
-      </div>
-
-      <div class="card-glass p-6 mb-8">
-        <div class="flex justify-between mb-2">
-          <span class="font-medium">修行进度</span>
-          <span id="progress-text">0 / 100</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-xl h-4">
-          <div id="progress-bar" class="progress-bar rounded-xl h-4" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <div class="card-glass p-8 mb-8 text-center relative">
-        <div class="mb-6">
-          <h3 class="text-2xl font-bold text-gray-800 mb-2">敲击木鱼</h3>
-          <p class="text-gray-600">点击木鱼积累功德，每100次敲击提升一级</p>
-        </div>
-        <div class="flex justify-center mb-6">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1606743825-936c2a0e8635?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" 
-                 alt="精美木鱼图片" 
-                 class="wooden-fish cursor-pointer w-64 h-64 mx-auto floating" 
-                 id="wooden-fish-img">
-            <div id="click-effects-container" class="absolute inset-0 pointer-events-none"></div>
+    <!-- 游戏主界面 -->
+    <div id="game-section" class="hidden text-center">
+      <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-white mb-2">欢迎，<span id="player-name" class="text-yellow-300"></span></h2>
+        <div class="flex flex-wrap justify-center gap-4 mt-3">
+          <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+            <p class="text-white text-sm">当前境界</p>
+            <p id="player-level" class="text-xl font-bold text-yellow-300">1</p>
+          </div>
+          <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
+            <p class="text-white text-sm">累积功德</p>
+            <p id="total-count" class="text-xl font-bold text-green-300">0</p>
           </div>
         </div>
-        <p class="text-gray-600">点击次数：<span id="click-count">0</span></p>
+      </div>
+      
+      <div class="my-8 floating">
+        <img src="https://picsum.photos/250/250?image=1062" alt="禅意木鱼图像" class="wooden-fish mx-auto cursor-pointer rounded-full" id="wooden-fish-img">
+      </div>
+      
+      <div class="mb-6">
+        <button id="knock-btn" class="pulse-animation bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white py-4 px-10 rounded-full text-xl font-bold shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <i class="fas fa-drum mr-2"></i>虔诚敲击
+        </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <button id="reset-btn" class="btn-secondary text-white py-4 rounded-xl font-bold flex items-center justify-center">
-          <i class="fas fa-redo mr-2"></i>重置数据
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+        <button id="view-ranking" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg">
+          <i class="fas fa-trophy mr-2"></i>功德榜单
         </button>
-        <button id="rankings-btn" class="btn-primary text-white py-4 rounded-xl font-bold flex items-center justify-center">
-          <i class="fas fa-trophy mr-2"></i>查看排行榜
-        </button>
-        <button id="logout-btn" class="btn-accent text-white py-4 rounded-xl font-bold flex items-center justify-center">
-          <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+        <button id="logout-btn" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg">
+          <i class="fas fa-sign-out-alt mr-2"></i>离开禅堂
         </button>
       </div>
     </div>
 
-    <div id="rankings-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
-      <div class="card-glass rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-        <button id="close-rankings" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl z-10">
-          <i class="fas fa-times"></i>
-        </button>
-        <div class="p-8">
-          <div class="text-center mb-8">
-            <i class="fas fa-trophy text-5xl text-yellow-500 mb-4"></i>
-            <h2 class="text-3xl font-bold text-gray-800">功德排行榜</h2>
-            <p class="text-gray-600 mt-2">见证修行者的成就</p>
-          </div>
-          
-          <div class="flex flex-wrap gap-3 mb-6 justify-center">
-            <button class="tab-btn active bg-blue-500 text-white px-6 py-3 rounded-xl font-bold" data-tab="total">
-              <i class="fas fa-star mr-2"></i>总榜
-            </button>
-            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="daily">
-              <i class="fas fa-sun mr-2"></i>日榜
-            </button>
-            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="weekly">
-              <i class="fas fa-calendar-week mr-2"></i>周榜
-            </button>
-            <button class="tab-btn bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-xl font-bold" data-tab="monthly">
-              <i class="fas fa-calendar-alt mr-2"></i>月榜
-            </button>
-          </div>
-          
-          <div id="rankings-content" class="text-left">
-          </div>
+    <!-- 排行榜弹窗 -->
+    <div id="ranking-modal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-2xl p-6 relative animate__animated animate__fadeInDown">
+        <button id="close-ranking" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">&times;</button>
+        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">功德排行榜</h2>
+        <div class="mb-6 flex flex-wrap justify-center gap-2">
+          <button class="ranking-tab active px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-medium" data-type="total">总榜</button>
+          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="daily">日榜</button>
+          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="weekly">周榜</button>
+          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="monthly">月榜</button>
+        </div>
+        <div id="ranking-content" class="max-h-96 overflow-y-auto pr-2">
+          <!-- 动态加载排行榜内容 -->
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="w-full max-w-4xl text-center text-gray-500 mt-8 pb-4">
-    <p>&copy; 2026 禅意木鱼 - 冥想敲击游戏 | 积德行善，从敲木鱼开始</p>
+  <footer class="mt-10 text-white text-center opacity-80">
+    <p><i class="fas fa-pray mr-2"></i>© 2026 禅意木鱼 - 静心修行，积累功德</p>
   </footer>
 
-  <script src="app.js"></script>
-</body>
-</html>
+  <script>
+    // 模拟用户数据存储（实际应使用后端数据库）
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    const currentUserKey = 'current_user';
+
+    // 初始化页面元素
+    const authSection = document.getElementById('auth-section');
+    const loginForm = document.getElementById('login-form');
+    const gameSection = document.getElementById('game-section');
+    const playerNameSpan = document.getElementById('player-name');
+    const playerLevelSpan = document.getElementById('player-level');
+    const totalCountSpan = document.getElementById('total-count');
+    const woodenFishImg = document.getElementById('wooden-fish-img');
+    const knockBtn = document.getElementById('knock-btn');
+    const viewRankingBtn = document.getElementById('view-ranking');
+    const logoutBtn = document.getElementById('logout-btn');
+    const rankingModal = document.getElementById('ranking-modal');
+    const closeRankingBtn = document.getElementById('close-ranking');
+    const rankingContent = document.getElementById('ranking-content');
+    const rankingTabs = document.querySelectorAll('.ranking-tab');
+
+    // 切换显示区域
+    function showSection(section) {
+      [authSection, loginForm, gameSection].forEach(s => s.classList.add('hidden'));
+      section.classList.remove('hidden');
+    }
+
+    // 获取当前用户信息
+    function getCurrentUser() {
+      const username = localStorage.getItem(currentUserKey);
+      return username ? users[username] : null;
+    }
+
+    // 更新用户信息显示
+    function updateUserInfo() {
+      const user = getCurrentUser();
+      if (user) {
+        playerNameSpan.textContent = user.name;
+        playerLevelSpan.textContent = user.level;
+        totalCountSpan.textContent = user.totalCount;
+      }
+    }
+
+    // 敲击木鱼事件
+    function handleKnock() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      user.totalCount += 1;
+      user.level = Math.floor(user.totalCount / 10) + 1; // 每10次升一级
+      users[user.name] = user;
+      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInfo();
+      
+      // 添加敲击特效
+      woodenFishImg.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        woodenFishImg.style.transform = 'scale(1)';
+      }, 100);
+    }
+
+    // 登录处理
+    function handleLogin(username) {
+      if (!username.trim()) {
+        alert('请输入法号');
+        return;
+      }
+
+      if (users[username]) {
+        // 已存在用户，直接登录
+        localStorage.setItem(currentUserKey, username);
+      } else {
+        // 新用户注册
+        users[username] = {
+          name: username,
+          totalCount: 0,
+          level: 1,
+          lastLogin: new Date().toISOString()
+        };
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem(currentUserKey, username);
+      }
+
+      showSection(gameSection);
+      updateUserInfo();
+    }
+
+    // 退出登录
+    function handleLogout() {
+      localStorage.removeItem(currentUserKey);
+      showSection(authSection);
+    }
+
+    // 显示排行榜
+    function showRanking(type) {
+      let sortedUsers = [];
+      const now = new Date();
+
+      switch(type) {
+        case 'daily':
+          sortedUsers = Object.values(users)
+            .filter(u => {
+              const lastLogin = new Date(u.lastLogin);
+              return lastLogin.toDateString() === now.toDateString();
+            })
+            .sort((a, b) => b.totalCount - a.totalCount);
+          break;
+        case 'weekly':
+          const oneWeekAgo = new Date(now);
+          oneWeekAgo.setDate(now.getDate() - 7);
+          sortedUsers = Object.values(users)
+            .filter(u => new Date(u.lastLogin) >= oneWeekAgo)
+            .sort((a, b) => b.totalCount - a.totalCount);
+          break;
+        case 'monthly':
+          const oneMonthAgo = new Date(now);
+          oneMonthAgo.setMonth(now.getMonth() - 1);
+          sortedUsers = Object.values(users)
+            .filter(u => new Date(u.lastLogin) >= oneMonthAgo)
+            .sort((a, b) => b.totalCount - a.totalCount);
+          break;
+        default: // total
+          sortedUsers = Object.values(users).sort((a, b) => b.totalCount - a.totalCount);
+      }
+
+      rankingContent.innerHTML = '';
+      if (sortedUsers.length === 0) {
+        rankingContent.innerHTML = '<p class="text-center text-gray-500 py-8">暂无修行者记录</p>';
+        return;
+      }
+
+      sortedUsers.slice(0, 10).forEach((user, index) => {
+        const rankItem = document.createElement('div');
+        rankItem.className = 'rank-item flex items-center justify-between p-4 mb-3 bg-white rounded-xl shadow-sm hover:shadow-md transition';
+        rankItem.innerHTML = `
+          <div class="flex items-center">
+            <div class="rank-number w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-4">
+              ${index + 1}
+            </div>
+            <div>
+              <div class="font-bold text-gray-800">${user.name}</div>
+              <div class="text-sm text-gray-600">第${user.level}重境界</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-bold text-purple-600">${user.totalCount}</div>
+            <div class="text-xs text-gray-500">功德点</div>
+          </div>
+        `;
+        rankingContent.appendChild(rankItem);
+      });
+    }
+
+    // 初始化事件监听器
+    document.getElementById('guest-login').addEventListener('click', () => {
+      const guestName = `修行者${Math.floor(Math.random() * 10000)}`;
+      handleLogin(guestName);
+    });
+
+    document.getElementById('account-login').addEventListener('click', () => {
+      showSection(loginForm);
+    });
+
+    document.getElementById('submit-login').addEventListener('click', () => {
+      const username = document.getElementById('username').value;
+      handleLogin(username);
+    });
+
+    document.getElementById('back-to-auth').addEventListener('click', () => {
+      showSection(authSection);
+    });
+
+    knockBtn.addEventListener('click', handleKnock);
+    woodenFishImg.addEventListener('click', handleKnock);
+
+    viewRankingBtn.addEventListener('click', () => {
+      rankingModal.classList.remove('hidden');
+      showRanking('total');
+    });
+
+    closeRankingBtn.addEventListener('click', () => {
+      rankingModal.classList.add('hidden');
+    });
+
+    logoutBtn.addEventListener('click', handleLogout);
+
+    rankingTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        rankingTabs.forEach(t => {
+          t.classList.remove('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
+          t.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-100');
+        });
+        tab.classList.add('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
+        tab.classList.remove('bg-white', 'text-gray-700
