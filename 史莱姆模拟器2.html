@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高级史莱姆模拟器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .slime-container {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .control-panel {
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 15px;
+    }
+    .particle {
+      border-radius: 50%;
+      position: absolute;
+      pointer-events: none;
+    }
+    .btn-glass {
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+    .slider-container input[type="range"] {
+      background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+      height: 8px;
+      border-radius: 4px;
+    }
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <div class="w-full max-w-6xl">
+    <!-- 标题栏 -->
+    <div class="text-center mb-6">
+      <h1 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">🎮 高级史莱姆模拟器 🧽</h1>
+      <p class="text-lg text-blue-200">体验真实的粘液物理效果 - 点击并拖拽创造你的专属史莱姆！</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+      <!-- 主模拟区域 -->
+      <div class="flex-1">
+        <div class="slime-container bg-black/20 h-[500px] relative cursor-pointer" id="slimeArea">
+          <div id="particlesContainer" class="absolute inset-0"></div>
+          
+          <!-- 工具提示 -->
+          <div class="absolute top-4 left-4 bg-black/50 text-white text-sm p-3 rounded-lg max-w-xs hidden md:block">
+            <p><i class="fas fa-mouse-pointer mr-2"></i>鼠标左键拖拽</p>
+            <p><i class="fas fa-mobile-alt mr-2"></i>触屏滑动</p>
+            <p><i class="fas fa-bolt mr-2"></i>调整参数观察变化</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 控制面板 -->
+      <div class="lg:w-80 control-panel p-5 text-white">
+        <h2 class="text-2xl font-bold mb-4 text-center"><i class="fas fa-sliders-h mr-2"></i>控制面板</h2>
+        
+        <!-- 基本控制 -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-3 flex items-center"><i class="fas fa-cogs mr-2"></i>基本控制</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <button id="resetBtn" class="btn-glass py-3 px-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-sync-alt text-xl mb-1"></i>
+              <span>重置</span>
+            </button>
+            <button id="physicsBtn" class="btn-glass py-3 px-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-bolt text-xl mb-1"></i>
+              <span id="physicsText">关闭物理</span>
+            </button>
+            <button id="colorBtn" class="btn-glass py-3 px-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-palette text-xl mb-1"></i>
+              <span>换色</span>
+            </button>
+            <button id="shapeBtn" class="btn-glass py-3 px-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-shapes text-xl mb-1"></i>
+              <span>变形</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 物理参数 -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-3 flex items-center"><i class="fas fa-atom mr-2"></i>物理参数</h3>
+          <div class="space-y-4">
+            <div class="slider-container">
+              <label class="block mb-1">粘性: <span id="viscosityValue">0.95</span></label>
+              <input type="range" id="viscositySlider" min="0.8" max="0.99" step="0.01" value="0.95" class="w-full">
+            </div>
+            <div class="slider-container">
+              <label class="block mb-1">弹性: <span id="elasticityValue">0.8</span></label>
+              <input type="range" id="elasticitySlider" min="0.1" max="1.0" step="0.1" value="0.8" class="w-full">
+            </div>
+            <div class="slider-container">
+              <label class="block mb-1">粒子数: <span id="particleCountValue">150</span></label>
+              <input type="range" id="particleCountSlider" min="50" max="300" step="10" value="150" class="w-full">
+            </div>
+          </div>
+        </div>
+
+        <!-- 预设样式 -->
+        <div>
+          <h3 class="text-lg font-semibold mb-3 flex items-center"><i class="fas fa-star mr-2"></i>预设样式</h3>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="water">💧 水滴</button>
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="honey">🍯 蜂蜜</button>
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="jelly">🍮 果冻</button>
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="magma">🌋 岩浆</button>
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="glow">✨ 荧光</button>
+            <button class="preset-btn btn-glass py-2 rounded-lg" data-preset="rainbow">🌈 彩虹</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 信息面板 -->
+    <div class="mt-6 control-panel p-5 text-white">
+      <h3 class="text-xl font-bold mb-3"><i class="fas fa-info-circle mr-2"></i>玩法说明</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="flex items-start">
+          <i class="fas fa-mouse-pointer text-blue-400 text-xl mt-1 mr-3"></i>
+          <div>
+            <h4 class="font-semibold">交互操作</h4>
+            <p class="text-sm text-gray-300">鼠标拖拽或触屏滑动来变形史莱姆</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-sliders-h text-green-400 text-xl mt-1 mr-3"></i>
+          <div>
+            <h4 class="font-semibold">参数调节</h4>
+            <p class="text-sm text-gray-300">调整粘性、弹性等物理参数</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-magic text-purple-400 text-xl mt-1 mr-3"></i>
+          <div>
+            <h4 class="font-semibold">样式切换</h4>
+            <p class="text-sm text-gray-300">尝试不同预设样式获得独特效果</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="史莱姆模拟器2.js"></script>
+</body>
+</html>
