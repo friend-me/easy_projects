@@ -4,338 +4,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>禅意木鱼 - 冥想敲击游戏</title>
+  <title>敲木鱼小游戏</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      min-height: 100vh;
+      background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .wooden-fish {
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-    }
-    .wooden-fish:hover {
-      transform: scale(1.05);
+      transition: transform 0.1s ease-in-out;
     }
     .wooden-fish:active {
       transform: scale(0.95);
     }
-    .pulse-animation {
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-    }
-    .floating {
-      animation: floating 3s ease-in-out infinite;
-    }
-    @keyframes floating {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-    .glow-text {
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-    .modal-backdrop {
-      backdrop-filter: blur(5px);
-    }
-    .rank-item:nth-child(1) .rank-number { background: linear-gradient(45deg, #ffd700, #ffa500); }
-    .rank-item:nth-child(2) .rank-number { background: linear-gradient(45deg, #c0c0c0, #a9a9a9); }
-    .rank-item:nth-child(3) .rank-number { background: linear-gradient(45deg, #cd7f32, #a0522d); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
-  <header class="w-full max-w-4xl mb-8 text-center">
-    <h1 class="text-5xl font-bold text-white glow-text mb-2">禅意木鱼</h1>
-    <p class="text-xl text-white opacity-90">敲击木鱼，积累功德，静心修行</p>
+  <header class="w-full max-w-4xl mb-6 text-center">
+    <h1 class="text-4xl font-bold text-white drop-shadow-md">敲木鱼小游戏</h1>
+    <p class="text-white mt-2">敲击木鱼，积累功德，提升等级，查看排行榜！</p>
   </header>
 
-  <main class="w-full max-w-4xl bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8">
+  <main class="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6">
     <!-- 登录/游客模式选择 -->
-    <div id="auth-section" class="mb-8">
-      <h2 class="text-3xl font-semibold text-white mb-6 text-center">选择修行方式</h2>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button id="guest-login" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-8 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
-          <i class="fas fa-user-secret mr-2"></i>匿名修行
-        </button>
-        <button id="account-login" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 px-8 rounded-xl text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
-          <i class="fas fa-sign-in-alt mr-2"></i>正式入门
-        </button>
+    <div id="auth-section" class="mb-6">
+      <h2 class="text-2xl font-semibold mb-4">选择登录方式</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <button id="guest-login" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex-1 transition">游客模式</button>
+        <button id="account-login" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex-1 transition">登录账号</button>
       </div>
     </div>
 
     <!-- 登录表单 -->
-    <div id="login-form" class="hidden mb-8">
-      <div class="max-w-md mx-auto bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-        <h2 class="text-2xl font-semibold text-white mb-4 text-center">佛门登记</h2>
-        <input type="text" id="username" placeholder="请输入法号" class="w-full p-3 border border-gray-300 rounded-lg mb-4 bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500">
-        <button id="submit-login" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg">
-          <i class="fas fa-dharmachakra mr-2"></i>正式入门
-        </button>
-        <button id="back-to-auth" class="mt-3 w-full text-white hover:text-gray-200 py-2 px-4 rounded transition flex items-center justify-center">
-          <i class="fas fa-arrow-left mr-2"></i>返回选择
-        </button>
-      </div>
+    <div id="login-form" class="hidden mb-6">
+      <h2 class="text-2xl font-semibold mb-4">登录/注册</h2>
+      <input type="text" id="username" placeholder="请输入用户名" class="w-full p-2 border border-gray-300 rounded mb-2">
+      <button id="submit-login" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded w-full transition">确认登录</button>
+      <button id="back-to-auth" class="mt-2 text-blue-500 hover:underline">返回选择</button>
     </div>
 
     <!-- 游戏主界面 -->
     <div id="game-section" class="hidden text-center">
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold text-white mb-2">欢迎，<span id="player-name" class="text-yellow-300"></span></h2>
-        <div class="flex flex-wrap justify-center gap-4 mt-3">
-          <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-            <p class="text-white text-sm">当前境界</p>
-            <p id="player-level" class="text-xl font-bold text-yellow-300">1</p>
-          </div>
-          <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-            <p class="text-white text-sm">累积功德</p>
-            <p id="total-count" class="text-xl font-bold text-green-300">0</p>
-          </div>
-        </div>
+      <h2 class="text-2xl font-semibold mb-2">欢迎，<span id="player-name" class="text-purple-600"></span></h2>
+      <p class="text-lg mb-4">当前等级：<span id="player-level" class="font-bold">1</span> | 总敲击次数：<span id="total-count" class="font-bold">0</span></p>
+      
+      <div class="my-6">
+        <img src="https://picsum.photos/200/200?image=1062" alt="木鱼图像" class="wooden-fish mx-auto cursor-pointer" id="wooden-fish-img">
       </div>
       
-      <div class="my-8 floating">
-        <img src="https://picsum.photos/250/250?image=1062" alt="禅意木鱼图像" class="wooden-fish mx-auto cursor-pointer rounded-full" id="wooden-fish-img">
-      </div>
-      
-      <div class="mb-6">
-        <button id="knock-btn" class="pulse-animation bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white py-4 px-10 rounded-full text-xl font-bold shadow-2xl transition-all duration-300 transform hover:scale-105">
-          <i class="fas fa-drum mr-2"></i>虔诚敲击
-        </button>
+      <div class="mb-4">
+        <button id="knock-btn" class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full text-xl font-bold shadow-lg transition">敲击木鱼</button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-        <button id="view-ranking" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg">
-          <i class="fas fa-trophy mr-2"></i>功德榜单
-        </button>
-        <button id="logout-btn" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg">
-          <i class="fas fa-sign-out-alt mr-2"></i>离开禅堂
-        </button>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <button id="view-ranking" class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded transition">查看排行榜</button>
+        <button id="logout-btn" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded transition">退出登录</button>
       </div>
     </div>
 
     <!-- 排行榜弹窗 -->
-    <div id="ranking-modal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-      <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-2xl p-6 relative animate__animated animate__fadeInDown">
-        <button id="close-ranking" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">&times;</button>
-        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">功德排行榜</h2>
-        <div class="mb-6 flex flex-wrap justify-center gap-2">
-          <button class="ranking-tab active px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-medium" data-type="total">总榜</button>
-          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="daily">日榜</button>
-          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="weekly">周榜</button>
-          <button class="ranking-tab px-5 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full font-medium shadow" data-type="monthly">月榜</button>
+    <div id="ranking-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl p-6 relative">
+        <button id="close-ranking" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">排行榜</h2>
+        <div class="mb-4 flex space-x-2">
+          <button class="ranking-tab active px-4 py-2 bg-blue-500 text-white rounded" data-type="total">总榜</button>
+          <button class="ranking-tab px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded" data-type="daily">日榜</button>
+          <button class="ranking-tab px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded" data-type="weekly">周榜</button>
+          <button class="ranking-tab px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded" data-type="monthly">月榜</button>
         </div>
-        <div id="ranking-content" class="max-h-96 overflow-y-auto pr-2">
+        <div id="ranking-content" class="h-64 overflow-y-auto">
           <!-- 动态加载排行榜内容 -->
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="mt-10 text-white text-center opacity-80">
-    <p><i class="fas fa-pray mr-2"></i>© 2026 禅意木鱼 - 静心修行，积累功德</p>
+  <footer class="mt-8 text-white text-center">
+    <p>© 2026 敲木鱼小游戏 - 积累功德，静心修行</p>
   </footer>
 
-  <script>
-    // 模拟用户数据存储（实际应使用后端数据库）
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const currentUserKey = 'current_user';
-
-    // 初始化页面元素
-    const authSection = document.getElementById('auth-section');
-    const loginForm = document.getElementById('login-form');
-    const gameSection = document.getElementById('game-section');
-    const playerNameSpan = document.getElementById('player-name');
-    const playerLevelSpan = document.getElementById('player-level');
-    const totalCountSpan = document.getElementById('total-count');
-    const woodenFishImg = document.getElementById('wooden-fish-img');
-    const knockBtn = document.getElementById('knock-btn');
-    const viewRankingBtn = document.getElementById('view-ranking');
-    const logoutBtn = document.getElementById('logout-btn');
-    const rankingModal = document.getElementById('ranking-modal');
-    const closeRankingBtn = document.getElementById('close-ranking');
-    const rankingContent = document.getElementById('ranking-content');
-    const rankingTabs = document.querySelectorAll('.ranking-tab');
-
-    // 切换显示区域
-    function showSection(section) {
-      [authSection, loginForm, gameSection].forEach(s => s.classList.add('hidden'));
-      section.classList.remove('hidden');
-    }
-
-    // 获取当前用户信息
-    function getCurrentUser() {
-      const username = localStorage.getItem(currentUserKey);
-      return username ? users[username] : null;
-    }
-
-    // 更新用户信息显示
-    function updateUserInfo() {
-      const user = getCurrentUser();
-      if (user) {
-        playerNameSpan.textContent = user.name;
-        playerLevelSpan.textContent = user.level;
-        totalCountSpan.textContent = user.totalCount;
-      }
-    }
-
-    // 敲击木鱼事件
-    function handleKnock() {
-      const user = getCurrentUser();
-      if (!user) return;
-
-      user.totalCount += 1;
-      user.level = Math.floor(user.totalCount / 10) + 1; // 每10次升一级
-      users[user.name] = user;
-      localStorage.setItem('users', JSON.stringify(users));
-      updateUserInfo();
-      
-      // 添加敲击特效
-      woodenFishImg.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        woodenFishImg.style.transform = 'scale(1)';
-      }, 100);
-    }
-
-    // 登录处理
-    function handleLogin(username) {
-      if (!username.trim()) {
-        alert('请输入法号');
-        return;
-      }
-
-      if (users[username]) {
-        // 已存在用户，直接登录
-        localStorage.setItem(currentUserKey, username);
-      } else {
-        // 新用户注册
-        users[username] = {
-          name: username,
-          totalCount: 0,
-          level: 1,
-          lastLogin: new Date().toISOString()
-        };
-        localStorage.setItem('users', JSON.stringify(users));
-        localStorage.setItem(currentUserKey, username);
-      }
-
-      showSection(gameSection);
-      updateUserInfo();
-    }
-
-    // 退出登录
-    function handleLogout() {
-      localStorage.removeItem(currentUserKey);
-      showSection(authSection);
-    }
-
-    // 显示排行榜
-    function showRanking(type) {
-      let sortedUsers = [];
-      const now = new Date();
-
-      switch(type) {
-        case 'daily':
-          sortedUsers = Object.values(users)
-            .filter(u => {
-              const lastLogin = new Date(u.lastLogin);
-              return lastLogin.toDateString() === now.toDateString();
-            })
-            .sort((a, b) => b.totalCount - a.totalCount);
-          break;
-        case 'weekly':
-          const oneWeekAgo = new Date(now);
-          oneWeekAgo.setDate(now.getDate() - 7);
-          sortedUsers = Object.values(users)
-            .filter(u => new Date(u.lastLogin) >= oneWeekAgo)
-            .sort((a, b) => b.totalCount - a.totalCount);
-          break;
-        case 'monthly':
-          const oneMonthAgo = new Date(now);
-          oneMonthAgo.setMonth(now.getMonth() - 1);
-          sortedUsers = Object.values(users)
-            .filter(u => new Date(u.lastLogin) >= oneMonthAgo)
-            .sort((a, b) => b.totalCount - a.totalCount);
-          break;
-        default: // total
-          sortedUsers = Object.values(users).sort((a, b) => b.totalCount - a.totalCount);
-      }
-
-      rankingContent.innerHTML = '';
-      if (sortedUsers.length === 0) {
-        rankingContent.innerHTML = '<p class="text-center text-gray-500 py-8">暂无修行者记录</p>';
-        return;
-      }
-
-      sortedUsers.slice(0, 10).forEach((user, index) => {
-        const rankItem = document.createElement('div');
-        rankItem.className = 'rank-item flex items-center justify-between p-4 mb-3 bg-white rounded-xl shadow-sm hover:shadow-md transition';
-        rankItem.innerHTML = `
-          <div class="flex items-center">
-            <div class="rank-number w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-4">
-              ${index + 1}
-            </div>
-            <div>
-              <div class="font-bold text-gray-800">${user.name}</div>
-              <div class="text-sm text-gray-600">第${user.level}重境界</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="font-bold text-purple-600">${user.totalCount}</div>
-            <div class="text-xs text-gray-500">功德点</div>
-          </div>
-        `;
-        rankingContent.appendChild(rankItem);
-      });
-    }
-
-    // 初始化事件监听器
-    document.getElementById('guest-login').addEventListener('click', () => {
-      const guestName = `修行者${Math.floor(Math.random() * 10000)}`;
-      handleLogin(guestName);
-    });
-
-    document.getElementById('account-login').addEventListener('click', () => {
-      showSection(loginForm);
-    });
-
-    document.getElementById('submit-login').addEventListener('click', () => {
-      const username = document.getElementById('username').value;
-      handleLogin(username);
-    });
-
-    document.getElementById('back-to-auth').addEventListener('click', () => {
-      showSection(authSection);
-    });
-
-    knockBtn.addEventListener('click', handleKnock);
-    woodenFishImg.addEventListener('click', handleKnock);
-
-    viewRankingBtn.addEventListener('click', () => {
-      rankingModal.classList.remove('hidden');
-      showRanking('total');
-    });
-
-    closeRankingBtn.addEventListener('click', () => {
-      rankingModal.classList.add('hidden');
-    });
-
-    logoutBtn.addEventListener('click', handleLogout);
-
-    rankingTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        rankingTabs.forEach(t => {
-          t.classList.remove('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
-          t.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-100');
-        });
-        tab.classList.add('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
-        tab.classList.remove('bg-white', 'text-gray-700
   <script src="script.js"></script>
 </body>
 </html>
