@@ -15,7 +15,7 @@
 
 ## 攻略
 
-
+https://github.com/friend-me/Easy_Projects/blob/main/攻略手册/README.md
 
 ## 其他好玩的
 
