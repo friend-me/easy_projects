@@ -13,3 +13,4 @@ https://github.com/friend-me/Easy_Projects/blob/main/README.md
 ## 攻略 · 目录
 
 * [史莱姆模拟器（系列）](https://github.com/friend-me/Easy_Projects/blob/main/%E6%94%BB%E7%95%A5%E6%89%8B%E5%86%8C/%E5%8F%B2%E8%8E%B1%E5%A7%86%E6%A8%A1%E6%8B%9F%E5%99%A8%EF%BC%88%E7%B3%BB%E5%88%97%EF%BC%89.md)
+* [闪电反应测试](https://github.com/friend-me/Easy_Projects/blob/main/%E6%94%BB%E7%95%A5%E6%89%8B%E5%86%8C/%E9%97%AA%E7%94%B5%E5%8F%8D%E5%BA%94%E6%B5%8B%E8%AF%95.md)
