@@ -12,6 +12,7 @@
 * [史莱姆模拟器](https://friend-me.github.io/Easy_Projects/史莱姆模拟器.html)
 * [史莱姆模拟器2](https://friend-me.github.io/Easy_Projects/史莱姆模拟器2.html)
 * [史莱姆模拟器3](https://friend-me.github.io/Easy_Projects/史莱姆模拟器3.html)
+* [史莱姆模拟器4](https://friend-me.github.io/Easy_Projects/史莱姆模拟器4.html)
 
 ## 攻略
 
