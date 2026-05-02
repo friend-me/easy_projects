@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>✨ 史莱姆梦境 · 真实戳戳乐 ✨</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(145deg, #1e1a2f 0%, #2a1e3c 100%);
+      font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+    }
+    .slime-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .slime-sidebar::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+    }
+    .slime-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(168, 85, 247, 0.6);
+      border-radius: 20px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    .slime-card-active {
+      border-left: 4px solid #c084fc;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(0,0,0,0.3));
+      box-shadow: 0 8px 20px -8px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-6 flex items-center justify-center">
+  <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-6 items-start">
+    
+    <!-- 主游戏区 -->
+    <div class="flex-1 min-w-0 bg-black/30 backdrop-blur-xl rounded-2xl border border-white/15 shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-white/10 flex flex-wrap justify-between items-center gap-3">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
+            🧫 软乎乎史莱姆 · 按压变形
+          </h1>
+          <p class="text-xs text-gray-300 mt-1 flex items-center gap-2">
+            <i class="fa-solid fa-hand-peace"></i> 手指/鼠标戳戳拖动 → 真实果冻质感
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button id="resetSlimeBtn" class="px-3 py-2 bg-red-500/80 hover:bg-red-600 rounded-xl text-white text-sm flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-arrows-rotate"></i> <span class="hidden sm:inline">恢复团子</span>
+          </button>
+          <button id="togglePhysicsBtn" class="px-3 py-2 bg-blue-500/80 hover:bg-blue-600 rounded-xl text-white text-sm flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-microchip"></i> <span id="physicsStateText">物理·开</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="relative w-full h-[420px] md:h-[520px] bg-[#0b081a] cursor-grab active:cursor-grabbing touch-none">
+        <canvas id="slimeCanvas" class="absolute inset-0 w-full h-full"></canvas>
+        <div class="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md rounded-full px-3 py-1.5 text-[11px] text-white/80 flex items-center gap-1 pointer-events-none">
+          <i class="fa-solid fa-fingerprint"></i> <span>按压拖动 → 史莱姆会凹陷/拉伸</span>
+        </div>
+      </div>
+      
+      <div class="p-3 text-center text-xs text-gray-400 border-t border-white/10 flex justify-between items-center">
+        <div class="flex gap-3">
+          <i class="fa-regular fa-circle-check text-emerald-400"></i> 
+          <span>粘性粒子群 · 手感优化</span>
+        </div>
+        <div><i class="fa-regular fa-clock"></i> 戳一戳，解压神器</div>
+      </div>
+    </div>
+    
+    <!-- 右侧图鉴管理 -->
+    <div class="w-full lg:w-80 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/15 shadow-2xl flex flex-col overflow-hidden">
+      <div class="px-5 pt-5 pb-3 border-b border-white/10">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-book-skull text-purple-300 text-xl"></i>
+          <h2 class="font-bold text-white text-lg">📒 史莱姆收藏馆</h2>
+        </div>
+        <p class="text-[12px] text-purple-200/70 mt-1">保存每个小可爱的样貌，随时切换</p>
+      </div>
+      
+      <div class="p-4 border-b border-white/10 bg-white/5">
+        <div class="flex flex-col gap-3">
+          <div class="flex gap-2">
+            <input type="text" id="newSlimeName" placeholder="取名 例: 草莓麻糬" maxlength="20" class="flex-1 bg-black/50 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <button id="createSlimeBtn" class="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-1">
+              <i class="fa-regular fa-floppy-disk"></i> 创建
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="type-preset text-xs bg-purple-800/40 px-3 py-1 rounded-full text-purple-200 cursor-pointer hover:bg-purple-700 transition" data-type="classic">🍏 翠绿团子</span>
+            <span class="type-preset text-xs bg-cyan-800/40 px-3 py-1 rounded-full text-cyan-200 cursor-pointer hover:bg-cyan-700 transition" data-type="aqua">💧 水漾史莱姆</span>
+            <span class="type-preset text-xs bg-orange-800/40 px-3 py-1 rounded-full text-orange-200 cursor-pointer hover:bg-orange-700 transition" data-type="magma">🔥 岩浆软糖</span>
+            <span class="type-preset text-xs bg-emerald-800/40 px-3 py-1 rounded-full text-emerald-200 cursor-pointer hover:bg-emerald-700 transition" data-type="forest">🌿 森林精灵</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto slime-sidebar max-h-[380px] p-3 space-y-2">
+        <div id="slimeListContainer" class="space-y-2"></div>
+        <div id="emptyState" class="text-center text-gray-400 text-sm py-12 flex flex-col gap-2 hidden">
+          <i class="fa-regular fa-face-smile-wink text-3xl"></i>
+          <span>暂无史莱姆~<br>点击「创建」开始培养！</span>
+        </div>
+      </div>
+      
+      <div class="p-4 border-t border-white/10 bg-[#0f0c1b]">
+        <div class="text-white/80 text-sm font-semibold mb-2 flex items-center gap-2">
+          <i class="fa-regular fa-pen-to-square"></i> 编辑当前史莱姆
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="editSlimeName" placeholder="新名字" class="flex-1 bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500">
+          <button id="updateSlimeBtn" class="bg-amber-600/80 hover:bg-amber-500 px-3 py-2 rounded-lg text-white text-sm transition"><i class="fa-regular fa-pen-to-square"></i></button>
+          <button id="deleteSlimeBtn" class="bg-rose-700/60 hover:bg-rose-600 px-3 py-2 rounded-lg text-white text-sm transition"><i class="fa-regular fa-trash-can"></i></button>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2"><i class="fa-regular fa-lightbulb"></i> 重命名会自动保存，戳完的外形也会自动记忆</p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    (function(){
+      // ---------- canvas 元素 ----------
+      const canvas = document.getElementById('slimeCanvas');
+      let ctx = canvas.getContext('2d');
+      let particles = [];
+      const PARTICLE_COUNT = 145;       // 适量粒子，性能+手感
+      
+      // 交互状态
+      let mouseX = null, mouseY = null;
+      let isMouseDown = false;
+      let physicsEnabled = true;
+      
+      // 物理参数 (手感调优，杜绝乱飞/坍缩)
+      let interactionRadius = 92;         // 鼠标影响半径
+      let repulsionStrength = 0.042;      // 戳开力度（柔和但明显）
+      let damping = 0.945;                // 速度阻尼，很快稳定
+      let gravity = 0.018;               // 微弱重力，让史莱姆自然下沉
+      let maxSpeed = 2.9;                // 限速防飞
+      // 粒子间维稳: 轻微弹性 (防止坍缩成一点，又不会扯成碎片)
+      let cohesionFactor = 0.00048;      // 远距离极微弱吸引，保持群体
+      let minSeparation = 8.5;           // 近距离推开避免重叠
+      
+      let canvasWidth = 0, canvasHeight = 0;
+      
+      // 数据持久化
+      let currentSlimeId = null;
+      let slimeDatabase = [];
+      
+      // 颜色预设
+      const COLOR_PALETTES = {
+        classic: { base: [70, 190, 90], var: [40, 100, 50], glow: [110, 230, 120] },
+        forest:  { base: [50, 140, 70], var: [30, 80, 40], glow: [80, 180, 80] },
+        aqua:    { base: [40, 170, 210], var: [30, 100, 80], glow: [90, 210, 240] },
+        magma:   { base: [210, 70, 40], var: [60, 50, 30], glow: [250, 120, 70] },
+        neon:    { base: [180, 60, 220], var: [70, 50, 90], glow: [210, 110, 255] }
+      };
+      
+      function generateColorsByType(type, count) {
+        const palette = COLOR_PALETTES[type] || COLOR_PALETTES.classic;
+        const colors = [];
+        for(let i=0; i<count; i++) {
+          let r = palette.base[0] + (Math.random() - 0.5) * palette.var[0];
+          let g = palette.base[1] + (Math.random() - 0.5) * palette.var[1];
+          let b = palette.base[2] + (Math.random() - 0.5) * palette.var[2];
+          r = Math.min(245, Math.max(50, r));
+          g = Math.min(230, Math.max(40, g));
+          b = Math.min(240, Math.max(50, b));
+          const alpha = 0.8 + Math.random() * 0.2;
+          colors.push(`rgba(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)}, ${alpha})`);
+        }
+        return colors;
+      }
+      
+      // 生成圆形团状史莱姆 (围绕中心聚拢，而不是散开)
+      function createCircularSlime(width, height, type) {
+        const cx = width / 2;
+        const cy = height / 2;
+        const radiusBase = Math.min(width, height) * 0.32;
+        const colors = generateColorsByType(type, PARTICLE_COUNT);
+        const parts = [];
+        for(let i=0; i<PARTICLE_COUNT; i++) {
+          // 环形+径向随机分布，看起来像一团Q弹果冻
+          const angle = Math.random() * Math.PI * 2;
+          const r = radiusBase * (0.4 + Math.random() * 0.7);
+          const x = cx + Math.cos(angle) * r * (0.7 + Math.random() * 0.6);
+          const y = cy + Math.sin(angle) * r * (0.7 + Math.random() * 0.6);
+          parts.push({
+            x: Math.min(width-12, Math.max(12, x)),
+            y: Math.min(height-12, Math.max(12, y)),
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: (Math.random() - 0.5) * 0.6,
+            radius: 2.4 + Math.random() * 3.2,
+            color: colors[i % colors.length]
+          });
+        }
+        return parts;
+      }
+      
+      // 保存当前粒子状态至当前史莱姆
+      function captureParticleSnapshot() {
+        if(!currentSlimeId) return null;
+        return particles.map(p => ({
+          x: p.x, y: p.y, vx: p.vx, vy: p.vy, radius: p.radius, color: p.color
+        }));
+      }
+      
+      function restoreParticleSnapshot(snapshot, width, height, type) {
+        if(snapshot && snapshot.length === PARTICLE_COUNT) {
+          return snapshot.map(p => ({
+            x: Math.min(width-6, Math.max(6, p.x)),
+            y: Math.min(height-6, Math.max(6, p.y)),
+            vx: p.vx || 0, vy: p.vy || 0,
+            radius: p.radius || 3,
+            color: p.color || `rgba(100,200,100,0.9)`
+          }));
+        } else {
+          return createCircularSlime(width, height, type);
+        }
+      }
+      
+      function persistCurrentState() {
+        if(!currentSlimeId) return;
+        const snapshot = captureParticleSnapshot();
+        const idx = slimeDatabase.findIndex(s => s.id === currentSlimeId);
+        if(idx !== -1 && snapshot) {
+          slimeDatabase[idx].particleSnapshot = snapshot;
+          slimeDatabase[idx].updatedAt = Date.now();
+          saveToLocal();
+        }
+      }
+      
+      function loadSlimeToCanvas(slimeId) {
+        const slime = slimeDatabase.find(s => s.id === slimeId);
+        if(!slime) return;
+        if(currentSlimeId && currentSlimeId !== slimeId) persistCurrentState();
+        currentSlimeId = slimeId;
+        const type = slime.type;
+        particles = restoreParticleSnapshot(slime.particleSnapshot, canvasWidth, canvasHeight, type);
+        document.getElementById('editSlimeName').value = slime.name;
+        renderSlimeList();
+      }
+      
+      // localStorage 操作
+      const STORAGE_KEY = 'SlimeRelaxV2';
+      function saveToLocal() {
+        const store = slimeDatabase.map(s => ({
+          id: s.id, name: s.name, type: s.type, createdAt: s.createdAt, updatedAt: s.updatedAt,
+          particleSnapshot: s.particleSnapshot ? s.particleSnapshot.slice() : null
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      }
+      
+      function loadFromLocal() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) {
+          try {
+            const data = JSON.parse(raw);
+            if(Array.isArray(data) && data.length) {
+              slimeDatabase = data;
+              for(let s of slimeDatabase) {
+                if(!s.type) s.type = 'classic';
+                if(!s.createdAt) s.createdAt = Date.now();
+              }
+              return true;
+            }
+          } catch(e) {}
+        }
+        // 默认一只初始史莱姆
+        const defaultId = 'slime_' + Date.now() + '_main';
+        slimeDatabase = [{
+          id: defaultId,
+          name: '🍡 小粉团',
+          type: 'classic',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          particleSnapshot: null
+        }];
+        saveToLocal();
+        return true;
+      }
+      
+      // 渲染右侧列表
+      function renderSlimeList() {
+        const container = document.getElementById('slimeListContainer');
+        const emptyDiv = document.getElementById('emptyState');
+        if(!container) return;
+        if(slimeDatabase.length === 0) {
+          emptyDiv.classList.remove('hidden');
+          container.innerHTML = '';
+          return;
+        }
+        emptyDiv.classList.add('hidden');
+        container.innerHTML = '';
+        slimeDatabase.forEach(slime => {
+          const active = (currentSlimeId === slime.id);
+          const card = document.createElement('div');
+          card.className = `p-3 rounded-xl transition-all cursor-pointer border ${active ? 'border-purple-400 slime-card-active' : 'border-white/10 hover:bg-white/5'}`;
+          let icon = slime.type === 'aqua' ? '💧' : (slime.type === 'magma' ? '🔥' : (slime.type==='forest'? '🌲' : '🍃'));
+          card.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div class="flex gap-2 items-center">
+                <span class="text-xl">${icon}</span>
+                <div><p class="font-semibold text-white text-sm">${escapeHtml(slime.name)}</p>
+                <p class="text-[10px] text-purple-300/70">${slime.type}</p></div>
+              </div>
+              <i class="fa-regular fa-hand-pointer text-purple-300/60 text-sm"></i>
+            </div>`;
+          card.addEventListener('click', () => {
+            if(currentSlimeId === slime.id) return;
+            if(currentSlimeId) persistCurrentState();
+            loadSlimeToCanvas(slime.id);
+          });
+          container.appendChild(card);
+        });
+        const cur = slimeDatabase.find(s=>s.id===currentSlimeId);
+        if(cur) document.getElementById('editSlimeName').value = cur.name;
+      }
+      
+      function escapeHtml(str){ return str.replace(/[&<>]/g, m=>({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+      
+      // 创建新史莱姆
+      function createSlime(name, type) {
+        if(!name.trim()) name = '✨ 软萌团子 ✨';
+        const newId = 'slime_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+        const newSlime = {
+          id: newId, name: name.trim(), type: type,
+          createdAt: Date.now(), updatedAt: Date.now(),
+          particleSnapshot: null
+        };
+        slimeDatabase.push(newSlime);
+        saveToLocal();
+        if(currentSlimeId) persistCurrentState();
+        currentSlimeId = newId;
+        particles = createCircularSlime(canvasWidth, canvasHeight, type);
+        renderSlimeList();
+        document.getElementById('editSlimeName').value = name;
+      }
+      
+      function updateCurrentName(newname) {
+        if(!currentSlimeId || !newname.trim()) return;
+        const idx = slimeDatabase.findIndex(s=>s.id===currentSlimeId);
+        if(idx !== -1) {
+          slimeDatabase[idx].name = newname.trim();
+          slimeDatabase[idx].updatedAt = Date.now();
+          saveToLocal();
+          renderSlimeList();
+        }
+      }
+      
+      function deleteCurrent() {
+        if(!currentSlimeId) return;
+        if(slimeDatabase.length === 1) {
+          alert("至少保留一只小史莱姆~ 无法删除最后一只");
+          return;
+        }
+        const idx = slimeDatabase.findIndex(s=>s.id===currentSlimeId);
+        if(idx !== -1) {
+          slimeDatabase.splice(idx,1);
+          saveToLocal();
+          currentSlimeId = slimeDatabase[0].id;
+          loadSlimeToCanvas(currentSlimeId);
+          renderSlimeList();
+        }
+      }
+      
+      // ---------- 核心物理更新 (稳定、不坍缩、不乱飞) ----------
+      function updatePhysics() {
+        if(!canvasWidth || !canvasHeight) return;
+        // 预计算鼠标力影响
+        const mouseActive = (physicsEnabled && isMouseDown && mouseX !== null && mouseY !== null);
+        
+        for(let i=0; i<particles.length; i++) {
+          const p = particles[i];
+          
+          // 鼠标交互: 向外推开 + 一点随机扰动 (逼真戳感)
+          if(mouseActive) {
+            const dx = p.x - mouseX;
+            const dy = p.y - mouseY;
+            const distSq = dx*dx + dy*dy;
+            const rad = interactionRadius;
+            if(distSq < rad*rad) {
+              const dist = Math.sqrt(distSq) + 0.01;
+              const force = (rad - dist) / rad;
+              const strength = repulsionStrength * force * 1.1;
+              p.vx += dx * strength;
+              p.vy += dy * strength;
+              // 轻微随机，增加软弹感
+              p.vx += (Math.random() - 0.5) * 0.12;
+              p.vy += (Math.random() - 0.5) * 0.12;
+            }
+          }
+          
+          // 粒子间相互作用: 防止坍缩 + 轻微凝聚保持整体
+          for(let j=i+1; j<particles.length; j++) {
+            const p2 = particles[j];
+            const dx2 = p.x - p2.x;
+            const dy2 = p.y - p2.y;
+            const dist = Math.hypot(dx2, dy2);
+            if(dist < 0.01) continue;
+            // 近距离推开（防止粒子重叠导致黏成一坨）
+            if(dist < minSeparation) {
+              const overlap = (minSeparation - dist) / dist;
+              const push = 0.35 * overlap;
+              const fx = dx2 * push;
+              const fy = dy2 * push;
+              p.vx += fx;
+              p.vy += fy;
+              p2.vx -= fx;
+              p2.vy -= fy;
+            }
+            // 远距离微弱引力，维持整体团状但不强力拉扯 (避免缩成一点)
+            else if(dist > 55 && dist < 130 && cohesionFactor > 0) {
+              const strength = cohesionFactor * (dist - 55) / 75;
+              const fx = dx2 * strength * 0.08;
+              const fy = dy2 * strength * 0.08;
+              p.vx -= fx;
+              p.vy -= fy;
+              p2.vx += fx;
+              p2.vy += fy;
+            }
+          }
+          
+          // 重力 + 阻尼
+          if(physicsEnabled) p.vy += gravity;
+          p.vx *= damping;
+          p.vy *= damping;
+          
+          // 限速
+          let spd = Math.hypot(p.vx, p.vy);
+          if(spd > maxSpeed) {
+            p.vx = (p.vx / spd) * maxSpeed;
+            p.vy = (p.vy / spd) * maxSpeed;
+          }
+          
+          // 更新坐标
+          p.x += p.vx;
+          p.y += p.vy;
+          
+          // 边界阻尼反弹（软边界）
+          const margin = 8;
+          if(p.x < margin) { p.x = margin + (margin - p.x)*0.3; p.vx = -p.vx * 0.65; }
+          if(p.x > canvasWidth - margin) { p.x = canvasWidth - margin - (p.x - (canvasWidth-margin))*0.3; p.vx = -p.vx * 0.65; }
+          if(p.y < margin) { p.y = margin + (margin - p.y)*0.3; p.vy = -p.vy * 0.65; }
+          if(p.y > canvasHeight - margin) { p.y = canvasHeight - margin - (p.y - (canvasHeight-margin))*0.3; p.vy = -p.vy * 0.65; }
+        }
+      }
+      
+      // 渲染粘液网络 + 高光粒子
+      function render() {
+        if(!ctx) return;
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        // 绘制丝滑连线 (增强粘稠感)
+        for(let i=0; i<particles.length; i++) {
+          for(let j=i+1; j<particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const dx = p1.x-p2.x, dy = p1.y-p2.y;
+            const dist = Math.hypot(dx, dy);
+            if(dist < 68) {
+              ctx.beginPath();
+              const opacity = 0.28 * (1 - dist/68);
+              ctx.strokeStyle = `rgba(200, 230, 255, ${opacity})`;
+              ctx.lineWidth = 1.2;
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        // 粒子本体 + 高光
+        for(let p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(p.x-1.2, p.y-1.2, p.radius*0.28, 0, Math.PI*2);
+          ctx.fillStyle = "rgba(255,250,210,0.45)";
+          ctx.fill();
+        }
+      }
+      
+      // resize 适配
+      function handleResize() {
+        const container = canvas.parentElement;
+        const newW = container.clientWidth;
+        const newH = container.clientHeight;
+        if(newW === canvasWidth && newH === canvasHeight) return;
+        canvas.width = newW;
+        canvas.height = newH;
+        canvasWidth = newW;
+        canvasHeight = newH;
+        if(particles.length) {
+          // 边界安全重置
+          for(let p of particles) {
+            p.x = Math.min(canvasWidth-8, Math.max(8, p.x));
+            p.y = Math.min(canvasHeight-8, Math.max(8, p.y));
+          }
+        } else if(currentSlimeId) {
+          let type = slimeDatabase.find(s=>s.id===currentSlimeId)?.type || 'classic';
+          particles = createCircularSlime(canvasWidth, canvasHeight, type);
+        }
+      }
+      
+      // 重置外形为圆形团子
+      function resetSlimeShape() {
+        if(currentSlimeId) {
+          const type = slimeDatabase.find(s=>s.id===currentSlimeId)?.type || 'classic';
+          particles = createCircularSlime(canvasWidth, canvasHeight, type);
+          persistCurrentState();
+        }
+      }
+      
+      function togglePhysics() {
+        physicsEnabled = !physicsEnabled;
+        const span = document.getElementById('physicsStateText');
+        span.innerText = physicsEnabled ? "物理·开" : "物理·闭";
+      }
+      
+      // 动画循环
+      let animId;
+      function animate() {
+        updatePhysics();
+        render();
+        animId = requestAnimationFrame(animate);
+      }
+      
+      // 事件绑定 (鼠标/触摸)
+      function setupEvents() {
+        const getCoords = (clientX, clientY) => {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          let x = (clientX - rect.left) * scaleX;
+          let y = (clientY - rect.top) * scaleY;
+          x = Math.min(canvasWidth, Math.max(0, x));
+          y = Math.min(canvasHeight, Math.max(0, y));
+          return { x, y };
+        };
+        const onPointerDown = (e) => {
+          e.preventDefault();
+          isMouseDown = true;
+          const {x,y} = getCoords(e.clientX, e.clientY);
+          mouseX = x; mouseY = y;
+        };
+        const onPointerMove = (e) => {
+          if(!isMouseDown) return;
+          const {x,y} = getCoords(e.clientX, e.clientY);
+          mouseX = x; mouseY = y;
+        };
+        const onPointerUp = () => {
+          isMouseDown = false;
+          mouseX = null; mouseY = null;
+        };
+        canvas.addEventListener('mousedown', onPointerDown);
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const t = e.touches[0]; const {x,y}=getCoords(t.clientX,t.clientY); isMouseDown=true; mouseX=x; mouseY=y; });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if(isMouseDown){ const t=e.touches[0]; const {x,y}=getCoords(t.clientX,t.clientY); mouseX=x; mouseY=y; } });
+        canvas.addEventListener('touchend', () => { isMouseDown=false; mouseX=null; mouseY=null; });
+      }
+      
+      // 启动
+      function init() {
+        loadFromLocal();
+        const container = canvas.parentElement;
+        canvasWidth = container.clientWidth;
+        canvasHeight = container.clientHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        ctx = canvas.getContext('2d');
+        currentSlimeId = slimeDatabase[0].id;
+        const firstType = slimeDatabase[0].type;
+        particles = createCircularSlime(canvasWidth, canvasHeight, firstType);
+        if(slimeDatabase[0].particleSnapshot) {
+          particles = restoreParticleSnapshot(slimeDatabase[0].particleSnapshot, canvasWidth, canvasHeight, firstType);
+        }
+        renderSlimeList();
+        setupEvents();
+        animate();
+        window.addEventListener('resize', () => { handleResize(); renderSlimeList(); });
+        document.getElementById('resetSlimeBtn').addEventListener('click', resetSlimeShape);
+        document.getElementById('togglePhysicsBtn').addEventListener('click', togglePhysics);
+        document.getElementById('createSlimeBtn').addEventListener('click', () => {
+          let name = document.getElementById('newSlimeName').value;
+          if(!name) name = "🍬 新史莱姆";
+          createSlime(name, 'classic');
+        });
+        document.getElementById('updateSlimeBtn').addEventListener('click', () => {
+          const newName = document.getElementById('editSlimeName').value;
+          if(newName) updateCurrentName(newName);
+        });
+        document.getElementById('deleteSlimeBtn').addEventListener('click', deleteCurrent);
+        document.querySelectorAll('.type-preset').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const t = btn.getAttribute('data-type');
+            let nameHint = t==='aqua'?'💧 波波水母': (t==='magma'?'🔥 火晶史莱姆': (t==='forest'?'🌿 苔藓团子':'🍏 翡翠果冻'));
+            document.getElementById('newSlimeName').value = nameHint;
+            createSlime(nameHint, t);
+          });
+        });
+        window.addEventListener('beforeunload', () => { if(currentSlimeId) persistCurrentState(); });
+      }
+      
+      init();
+    })();
+  </script>
+</body>
+</html>
